@@ -3,7 +3,7 @@ Drone Aided Device-to-Device Networks for Communications and Health Connectivity
 
 
 <p align="center"> 
-<img src="https://github.com/gadm21/HeleLora/images/Nfrf project overview.pdf">
+<img src="https://github.com/gadm21/HeleLora/images/Nfrf project overview.png">
 </p>
 
 # Komondor: An IEEE 802.11ax Simulator
