@@ -325,7 +325,7 @@ class miband(Peripheral):
         self.write_cmd(self._char_heart_ctrl, BYTEPATTERNS.heart_measure_keepalive, response=True)
 
 
-    def start_heart_and_gyro(self, sensitivity, callback):
+    def start_heart_and_gyro(self, sensitivity, callback, start_time, duration):
         self.heart_measure_callback = callback
         self.gyro_raw_callback = callback
 
@@ -340,3 +340,7 @@ class miband(Peripheral):
                 heartbeat_time = time.time()
                 self.send_heart_measure_keepalive()
                 self.send_gyro_start(sensitivity)
+
+            if int(time.time() - start_time) > duration * 60 : 
+                return 
+            else: print("time:", time.time() - start_time, " duration:", duration) 

@@ -68,8 +68,7 @@ class Average_Gyro_Data():
             gyro_movement[0] += gyro_delta_x
             gyro_movement[1] += gyro_delta_y
             gyro_movement[2] += gyro_delta_z
-            gyro_delta_sum = gyro_delta_x_abs + gyro_delta_y_abs + gyro_delta_z_abs
-            gyro_movement[3] += gyro_delta_sum
+            gyro_movement[3] += (gyro_delta_x_abs + gyro_delta_y_abs + gyro_delta_z_abs)
 
         return gyro_movement
 

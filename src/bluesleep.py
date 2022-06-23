@@ -11,7 +11,6 @@ from vibrate import Vibrate
 
 auth_key_filename = 'auth_key.txt'
 mac_filename = 'mac.txt'
-
 maximize_graph = False
 
 vibration_settings = {
@@ -22,6 +21,12 @@ vibration_settings = {
     }
 
 band = None
+
+# list of lists. Each element is a list of 6 measurements at some time t. The measurements are (ordered):
+# [gyro_x_delta, gryo_y_delta, gyro_z_delta, abs_delta_sum, current_HR, HR_change_rate]
+timeseries_data = [] 
+
+timeseries_maxlen = 30
 
 #-------------------------------------------------------------------------#
 
@@ -66,18 +71,33 @@ def average_data(tick_time):
         sleepdata.average_raw_data(tick_time)
         sleepdata.last_tick_time = time.time()
 
+
+def get_HR_change_rate(current_HR):
+    min_HR = timeseries_data[0][4]
+    for data in timeseries_data : 
+        if data[4] < min_HR : 
+            min_HR  = data[4] 
+    return int((current_HR - min_HR) / min_HR * 100 )
    
+
 def sleep_monitor_callback(data):
     tick_time = time.time()
 
+    current_data = [0]*6
     if data[0] == 'GYRO_RAW': 
         gyro_movement = sleepdata.process_gyro_data(data[1], tick_time)  
+        current_data[:-1] = gyro_movement
         print("Gyro movement: {}".format(gyro_movement))
+
     elif data[0] == 'HR' : 
+        current_data[4] = data[1]
+        current_data[5] = get_HR_change_rate(data[1]) 
         print("Heart rate: {}".format(data[1]), end = '\t') 
         print("Timestamp: {}".format(tick_time))
     
-    return 
+    timeseries_data.append(current_data)
+     
+    return
 
     if not sleepdata.last_tick_time:
         sleepdata.last_tick_time = time.time()

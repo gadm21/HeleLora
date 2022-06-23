@@ -181,6 +181,7 @@ class Vibrate():
                     for x in range(40, 20, -1):
                         self.vibrate_band.vibrate(x)
 
+
     def vibrate_continuous(self, duration_seconds):
         #Currently broken, still working on this bit.
         print("Sending continuous vibration...")
