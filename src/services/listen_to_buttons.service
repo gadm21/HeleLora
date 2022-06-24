@@ -1,0 +1,11 @@
+[Unit]
+Description= a service to start on boot, never close, and listen for buttons
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python ./services/listen_to_buttons.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
