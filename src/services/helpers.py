@@ -7,7 +7,7 @@ import time
 
 
 url = 'http://nightlight/' # I map this to my internal DNS hosting the node app
-gpio_pin_button=18 # The GPIO pin the button is attached to
+gpio_pin_button=8 # The GPIO pin the button is attached to
 gpio_pin_led=20 # the GPIO pin the led is attached to
 longpress_threshold=4 # If button is held this length of time, tells system to leave light on
 waiting_time_thershold = 7 # wait for this time (seconds) between starting the service and triggering the script
