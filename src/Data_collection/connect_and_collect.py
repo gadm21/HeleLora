@@ -80,16 +80,18 @@ def save_dataset():
     '''
     file_path = os.path.join('../Data', '{}_{}.txt'.format(args.label, int(time.time())) )
     with open(file_path, 'w') as f : 
-        f.write(str(args.label)) 
+        f.write(str(args.label))
+        f.write('\n') 
         for datum in timeseries_data : 
-            f.write(','.join(str(d) for d in datum)) 
+            f.write(','.join(str(d) for d in datum))
+            f.write('\n') 
       
 
 
    
 
 def sensors_callback(data):
-    tick_time = int(time.time())
+    tick_time = time.time() 
 
     data_type = data[0] 
     data = data[1] 
