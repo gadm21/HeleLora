@@ -1,6 +1,7 @@
 
 import wiringpi
 import time
+import subprocess
 
 # initialize
 wiringpi.wiringPiSetup()
@@ -97,7 +98,9 @@ def handle_states (prog_state, button_state) :
         else :
             
             if last_short_press_at > 0 and time.time() - last_short_press_at > waiting_between_short_presses :
-                print("running script label:", presses_counter)  
+                print("running script label:", presses_counter)
+                subprocess.call(['python', 'connect_and_collect.py', '-l {}'.format(presses_counter-1), '-d 1'])
+
     
     elif prog_state == 'collecting': 
         if button_state == 'long_pressed': 
