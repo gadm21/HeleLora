@@ -81,7 +81,7 @@ def save_dataset():
     x_feature_names = ['gyro_x_delta', 'gryo_y_delta', 'gyro_z_delta', 'abs_delta_sum', 'current_HR', 'HR_change_rate']
     df = pd.DataFrame(timeseries_data, columns = x_feature_names) 
     df['activity'] = [args.label] * len(df)
-    file_path = os.path.join('dataset', '{}_{}_{}.csv'.format(args.label, args.duration, int(time.time())) )
+    file_path = os.path.join('Data', '{}_{}_{}.csv'.format(args.label, args.duration, int(time.time())) )
     df.to_csv(file_path)  
 
 
