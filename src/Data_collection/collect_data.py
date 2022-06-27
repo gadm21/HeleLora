@@ -16,14 +16,6 @@ args = parser.parse_args()
 
 auth_key_filename = 'auth_key.txt'
 mac_filename = 'mac.txt'
-maximize_graph = False
-
-vibration_settings = {
-    'interval_minutes': 20,
-    'duration_seconds': 10,
-    'type': 'random',
-    'heartrate_alarm_pct': 17
-    }
 
 band = None
 
@@ -78,35 +70,33 @@ def average_data(tick_time):
 
 
 def save_dataset(): 
-    x_feature_names = ['gyro_x_delta', 'gryo_y_delta', 'gyro_z_delta', 'abs_delta_sum', 'current_HR', 'HR_change_rate']
-    df = pd.DataFrame(timeseries_data, columns = x_feature_names) 
-    df['activity'] = [args.label] * len(df)
-    file_path = os.path.join('Data', '{}_{}_{}.csv'.format(args.label, args.duration, int(time.time())) )
-    df.to_csv(file_path)  
+    ''' 
+    saves a txt file containing the data in the following format: 
+    - The first line contains the label 
+    - Each of the following line will either contain 4 or 2 comma separated values: 
+        * IF it contains 4 values, the values are for the variables ['gyro_x', 'gryo_y', 'gyro_z', 'timestamp']
+        * If it contains 2 values, the values are for the variables ['heart rate', 'timestamp']
+    '''
+    file_path = os.path.join('Data', '{}_{}.txt'.format(args.label, int(time.time())) )
+    with open(file_path, 'w') as f : 
+        f.write(args.label) 
+        for datum in timeseries_data : 
+            f.write(','.join(datum)) 
+      
 
 
-def get_HR_change_rate(current_HR):
-    min_HR = timeseries_data[0][4]
-    for data in timeseries_data : 
-        if data[4] < min_HR : 
-            min_HR  = data[4] 
-    if min_HR == 0 : min_HR += 0.1
-    return int((current_HR - min_HR) / min_HR * 100 )
    
 
-def sleep_monitor_callback(data):
-    tick_time = time.time()
+def sensors_callback(data):
+    tick_time = int(time.time())
 
-    current_data = [0]*6
-    if data[0] == 'GYRO_RAW': 
-        gyro_movement = sleepdata.process_gyro_data(data[1], tick_time)  
-        current_data[:-1] = gyro_movement
-        print("Gyro movement: {}".format(gyro_movement))
+    data_type = data[0] 
+    data = data[1] 
 
-    elif data[0] == 'HR' : 
-        current_data[4] = data[1]
-        print("Heart rate: {}".format(data[1]), end = '\t') 
-        current_data[5] = get_HR_change_rate(data[1]) 
+    if data_type == 'GYRO_RAW': 
+        current_data = [data['gyro_raw_x'], data['gyro_raw_y'], data['gyro_raw_z'], tick_time]
+    elif data_type == 'HR' : 
+        current_data = [data, tick_time]
         
     timeseries_data.append(current_data)
 
@@ -135,7 +125,7 @@ def connect():
 def start_data_pull():
     while True:
         try:
-            band.start_heart_and_gyro(sensitivity=1, callback=sleep_monitor_callback, start_time = start_time, duration = args.duration)
+            band.start_heart_and_gyro(sensitivity=1, callback=sensors_callback, start_time = start_time, duration = args.duration)
             if int(time.time() - start_time) > args.duration * 60 : 
                 save_dataset() 
                 return  

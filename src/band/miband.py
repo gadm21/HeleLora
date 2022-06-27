@@ -343,4 +343,3 @@ class miband(Peripheral):
 
             if int(time.time() - start_time) > duration * 60 : 
                 return 
-            else: print("time:", time.time() - start_time, " duration:", duration) 
