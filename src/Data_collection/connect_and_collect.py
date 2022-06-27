@@ -4,7 +4,7 @@ import time, re, threading, os, sys
 import argparse 
 from bluepy.btle import BTLEDisconnectError
 
-
+sys.path.append('../band')
 from miband import miband
 
 
@@ -78,11 +78,11 @@ def save_dataset():
         * IF it contains 4 values, the values are for the variables ['gyro_x', 'gryo_y', 'gyro_z', 'timestamp']
         * If it contains 2 values, the values are for the variables ['heart rate', 'timestamp']
     '''
-    file_path = os.path.join('Data', '{}_{}.txt'.format(args.label, int(time.time())) )
+    file_path = os.path.join('../Data', '{}_{}.txt'.format(args.label, int(time.time())) )
     with open(file_path, 'w') as f : 
-        f.write(args.label) 
+        f.write(str(args.label)) 
         for datum in timeseries_data : 
-            f.write(','.join(datum)) 
+            f.write(','.join(str(d) for d in datum)) 
       
 
 
@@ -95,11 +95,13 @@ def sensors_callback(data):
     data = data[1] 
 
     if data_type == 'GYRO_RAW': 
-        current_data = [data['gyro_raw_x'], data['gyro_raw_y'], data['gyro_raw_z'], tick_time]
+        for datum in data : 
+            current_data = [datum['gyro_raw_x'], datum['gyro_raw_y'], datum['gyro_raw_z'], tick_time]
+            timeseries_data.append(current_data)
     elif data_type == 'HR' : 
         current_data = [data, tick_time]
-        
-    timeseries_data.append(current_data)
+        timeseries_data.append(current_data)
+
 
 
 def connect():
