@@ -60,12 +60,13 @@ def clear_all():
 
 
 def blnk():
-    turn_off(led_pin) 
-    for i in range(4):
-        turn_on(led_pin)
-        wiringpi.delay(200)
+    for _ in range(4):
         turn_off(led_pin)
         wiringpi.delay(200)
+        turn_on(led_pin)
+        wiringpi.delay(200)
+    turn_off(led_pin) 
+
 
 def start() : 
     global last_long_press_at, program_state
@@ -86,7 +87,7 @@ def handle_states (prog_state, button_state) :
     if prog_state == 'idle': 
         if button_state == 'long_pressed': 
             start()
-            wiringpi.delay(500)
+            wiringpi.delay(300)
             
     elif prog_state == 'listening': 
         if button_state == 'long_pressed': 
@@ -97,15 +98,16 @@ def handle_states (prog_state, button_state) :
             last_short_press_at = time.time()
         else :
             
-            if last_short_press_at > 0 and time.time() - last_short_press_at > waiting_between_short_presses :
+            if presses_counter > 0 and last_short_press_at > 0 and time.time() - last_short_press_at > waiting_between_short_presses :
                 print("running script label:", presses_counter)
-                subprocess.call(['python', 'connect_and_collect.py', '-l {}'.format(presses_counter-1), '-d 1'])
+                subprocess.call(['python', 'connect_and_collect.py', '-l {}'.format(presses_counter), '-d 1'])
+                end()
 
     
     elif prog_state == 'collecting': 
         if button_state == 'long_pressed': 
             end()
-            wiringpi.delay(500)
+            wiringpi.delay(300)
 
     # print("program_state: {}, button_state:{}".format(prog_state, button_state))
     

@@ -64,16 +64,11 @@ def get_auth_key(filename):
     return AUTH_KEY
 
 
-def average_data(tick_time):
-    if (tick_time - sleepdata.last_tick_time) >= sleepdata.tick_seconds:
-        sleepdata.average_raw_data(tick_time)
-        sleepdata.last_tick_time = time.time()
-
 
 def save_dataset(): 
     ''' 
     saves a txt file containing the data in the following format: 
-    - The first line contains the label 
+    - The first line contains the label, which can be either 1 (exercise), 2 (sleeping), or 3 (studying). 
     - Each of the following line will either contain 4 or 2 comma separated values: 
         * IF it contains 4 values, the values are for the variables ['gyro_x', 'gryo_y', 'gyro_z', 'timestamp']
         * If it contains 2 values, the values are for the variables ['heart rate', 'timestamp']
