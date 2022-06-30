@@ -1,9 +1,10 @@
-
+#!/usr/bin/python
 import wiringpi
 import time
 import subprocess
 import threading
 
+from connect_and_collect import connect, start_data_pull
 
 # initialize
 wiringpi.wiringPiSetup()
@@ -26,7 +27,6 @@ wiringpi.pullUpDnControl(button_pin, PULL_DOWN)  # pull down
 
 program_state = 'idle' # Either 'idle' (not long pressed), 'listening' (counting short pressed after a long press), 'collecting' (started collecting data)
 button_state = 'pressed' # Either 'not_pressed', 'pressed', 'long_pressed'
-shared_bool = threading.Event() # Flag indicating whether the python script "connect_and_collect.py" was called and finished successfully or not. 
 long_pressed = False 
 presses_counter = 0
 last_long_press_at = 0 
@@ -108,7 +108,7 @@ def end() :
 
 
 def collect_data() :
-    global program_state, shared_bool, presses_counter
+    global program_state, presses_counter
     program_state = 'collecting' 
     print("collecting data")
     turn_on_for(led_pin, 5000)
@@ -116,12 +116,12 @@ def collect_data() :
     wiringpi.delay(1000)
     turn_on_for(led_pin, 5000)
 
-    while not shared_bool.is_set() : 
+    while program_state == 'collecting' : 
         blnk(led_pin, in_between_delay = 300, iterations = 3)
 
 
 def handle_states (prog_state, button_state) : 
-    global last_long_press_at, last_short_press_at, presses_counter, shared_bool
+    global last_long_press_at, last_short_press_at, presses_counter
     
     if prog_state == 'idle': 
         if button_state == 'long_pressed': 
@@ -144,10 +144,12 @@ def handle_states (prog_state, button_state) :
                     
                 t1 = threading.Thread(target = collect_data)
                 t1.start()
-
-                subprocess.Popen(['python', 'connect_and_collect.py', '-l {}'.format(presses_counter), '-d {}'.format(activities_durations[presses_counter])]).wait()
-                shared_bool.set()
-                t1.join()
+                
+                connect()
+                t2 = threading.Thread(target=start_data_pull, args = (activities_durations[presses_counter], presses_counter,))
+                t2.start()
+                t2.join()
+                
                 end()
              
 

@@ -4,7 +4,8 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python ./services/listen_to_buttons.py
+ExecStart= /usr/bin/python3.9 /home/pi/Desktop/HeleLora/src/Data_collection/listen_to_buttons.py
+Environment= "PYTHONPATH=$PYTHONPATH:/home/pi/.local/lib/python3.9/site-packages"
 Restart=on-abort
 
 [Install]

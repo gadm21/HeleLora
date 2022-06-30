@@ -4,15 +4,15 @@ import time, re, threading, os, sys
 import argparse 
 from bluepy.btle import BTLEDisconnectError
 
-sys.path.append('../band')
 from miband import miband
 
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-l', '--label', required=True, type = int, help='Set the label to be associated with the data that will be collection.')
-parser.add_argument('-d', '--duration', required=True, type = int, help='Set the duration (in minutes) for the script to run and collect data.')
-args = parser.parse_args()
+def get_args() : 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-l', '--label', required=True, type = int, help='Set the label to be associated with the data that will be collection.')
+    parser.add_argument('-d', '--duration', required=True, type = int, help='Set the duration (in minutes) for the script to run and collect data.')
+    args = parser.parse_args()
+    return args
 
 
 auth_key_filename = 'auth_key.txt'
@@ -65,7 +65,7 @@ def get_auth_key(filename):
 
 
 
-def save_dataset(): 
+def save_dataset(label): 
     ''' 
     saves a txt file containing the data in the following format: 
     - The first line contains the label, which can be either 1 (exercise), 2 (sleeping), or 3 (studying). 
@@ -73,9 +73,9 @@ def save_dataset():
         * IF it contains 4 values, the values are for the variables ['gyro_x', 'gryo_y', 'gyro_z', 'timestamp']
         * If it contains 2 values, the values are for the variables ['heart rate', 'timestamp']
     '''
-    file_path = os.path.join('../Data', '{}_{}.txt'.format(args.label, int(time.time())) )
+    file_path = os.path.join('/home/pi/Desktop/Data', '{}_{}_.txt'.format(label, int(time.time())) )
     with open(file_path, 'w') as f : 
-        f.write(str(args.label))
+        f.write(str(label))
         f.write('\n') 
         for datum in timeseries_data : 
             f.write(','.join(str(d) for d in datum))
@@ -122,12 +122,14 @@ def connect():
             exit()
 
 
-def start_data_pull():
+def start_data_pull(duration, label):
+    global start_time
+    start_time = time.time() 
     while True:
         try:
-            band.start_heart_and_gyro(sensitivity=1, callback=sensors_callback, start_time = start_time, duration = args.duration)
-            if int(time.time() - start_time) > args.duration * 60 : 
-                save_dataset() 
+            band.start_heart_and_gyro(sensitivity=1, callback=sensors_callback, start_time = start_time, duration = duration)
+            if int(time.time() - start_time) > duration * 60 : 
+                save_dataset(label) 
                 return  
              
         except BTLEDisconnectError:
@@ -137,6 +139,6 @@ def start_data_pull():
 
 
 if __name__ == "__main__":
+    args = get_args() 
     connect()
-    start_time = time.time() 
-    threading.Thread(target=start_data_pull).start()
+    threading.Thread(target=start_data_pull, args = (args.duration, args.label,)).start()
