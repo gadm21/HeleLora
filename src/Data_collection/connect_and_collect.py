@@ -3,6 +3,7 @@
 import time, re, threading, os, sys 
 import argparse 
 from bluepy.btle import BTLEDisconnectError
+import pathlib
 
 from miband import miband
 
@@ -106,9 +107,10 @@ def connect():
     success = False
     timeout = 3
     msg = 'Connection to the band failed. Trying again in {} seconds'
-
-    MAC_ADDR = get_mac_address(mac_filename)
-    AUTH_KEY = get_auth_key(auth_key_filename)
+    
+    current_directory = pathlib.Path(__file__).parent.resolve()
+    MAC_ADDR = get_mac_address(os.path.join(current_directory, mac_filename))
+    AUTH_KEY = get_auth_key(os.path.join(current_directory, auth_key_filename))
 
     while not success:
         try:

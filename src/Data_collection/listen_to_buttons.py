@@ -95,7 +95,7 @@ def start() :
     last_short_press_at = 0
     presses_counter = 0
     program_state = 'listening'
-    turn_on_for(led_pin, 5000) 
+    turn_on_for(led_pin, 4000) 
 
 def end() :
     print("END")
@@ -104,18 +104,15 @@ def end() :
     last_long_press_at = time.time()
     program_state = 'idle'
     last_short_press_at = 0
-    turn_on_for(led_pin, 5000) 
+    turn_on_for(led_pin, 4000) 
 
 
 def collect_data() :
     global program_state, presses_counter
     program_state = 'collecting' 
     print("collecting data")
-    turn_on_for(led_pin, 5000)
     blnk(led_pin, in_between_delay = 500, iterations = presses_counter)
-    wiringpi.delay(1000)
-    turn_on_for(led_pin, 5000)
-
+    wiringpi.delay(3000)
     while program_state == 'collecting' : 
         blnk(led_pin, in_between_delay = 300, iterations = 3)
 
@@ -146,9 +143,7 @@ def handle_states (prog_state, button_state) :
                 t1.start()
                 
                 connect()
-                t2 = threading.Thread(target=start_data_pull, args = (activities_durations[presses_counter], presses_counter,))
-                t2.start()
-                t2.join()
+                start_data_pull(activities_durations[presses_counter], presses_counter) 
                 
                 end()
              
