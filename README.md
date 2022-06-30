@@ -21,18 +21,18 @@ The lora sub-directory has python scripts that send a txt file, line by line, fr
 This repository is only tested on linux. 
 
 ## Data Collection
-1- Clone this repository: 'git clone https://github.com/gadm21/HeleLora'
-2- Authentication key and MAC address of the Miband4 are needed to access it and retrieve sensor readings. Refer to [freemyband website] (https://www.freemyband.com/) to acquire them. They should be put in the auth_key.txt and the mac.txt files in the Data_collection directory. 
-3- The listen_to_buttons.service file sets a background-running service in linux that listens for a button (since we are running this experiment on a rasspberry pi with a simple button and led circuit). To activate the service, run the following commands: 
+- Clone this repository: `git clone https://github.com/gadm21/HeleLora`
+- Authentication key and MAC address of the Miband4 are needed to access it and retrieve sensor readings. Refer to [freemyband website] (https://www.freemyband.com) to acquire them. They should be put in the auth_key.txt and the mac.txt files in the Data_collection directory. 
+- The listen_to_buttons.service file sets a background-running service in linux that listens for a button (since we are running this experiment on a rasspberry pi with a simple button and led circuit). To activate the service, run the following commands: 
 
-'''
-sudo cp /HeleLora/src/Data_collection/listen_to_buttons.service /lib/systemd/system/
-sudo systemctl daemon-reload # run this whenever you do changes to the service.
-sudo systemctl enable listen_to_buttons
-sudo systemctl start listen_to_buttons
-'''
+  ```
+  sudo cp /HeleLora/src/Data_collection/listen_to_buttons.service /lib/systemd/system/
+  sudo systemctl daemon-reload # run this whenever you do changes to the service.
+  sudo systemctl enable listen_to_buttons
+  sudo systemctl start listen_to_buttons
+  ```
 
 To check the status of the service: 'sudo systemctl status listen_to_buttons' 
 To disable the service: 'sudo systemctl disable listen_to_buttons'
 If the status of the service is active/running, this means that the service starts running as the system boots. The service listens for a long press on the button to start taking instructions, also through that single button, to set the activity label before starting connecting to the band and collecting data. 
-4- The circuit scheme will be uploaded soon!
+- The circuit scheme will be uploaded soon!
