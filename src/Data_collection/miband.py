@@ -203,19 +203,21 @@ class miband(Peripheral):
 
 
     def _parse_queue(self):
+        stop = False 
         while True:
             try:
                 queue_data = self.queue.get(False)
                 _type = queue_data[0]
                 if self.heart_measure_callback and _type == QUEUE_TYPES.HEART:
-                    self.heart_measure_callback(self._parse_heart_measure(queue_data[1]))
+                    stop = self.heart_measure_callback(self._parse_heart_measure(queue_data[1]))
                 elif self.gyro_raw_callback and _type == QUEUE_TYPES.RAW_GYRO:
-                    self.gyro_raw_callback(self._parse_raw_gyro(queue_data[1]))
+                    stop = self.gyro_raw_callback(self._parse_raw_gyro(queue_data[1]))
                 elif self.gyro_avg_callback and _type == QUEUE_TYPES.AVG_GYRO:
-                    self.gyro_avg_callback(self._parse_avg_gyro(queue_data[1]))
+                    stop = self.gyro_avg_callback(self._parse_avg_gyro(queue_data[1]))
             except Empty:
                 break
-
+        return stop
+        
     def _parse_avg_gyro(self, bytes):
         gyro_avg_data = struct.unpack('<b3h', bytes[1:])
         gyro_dict = {
@@ -335,11 +337,11 @@ class miband(Peripheral):
         heartbeat_time = time.time()
         while True:
             self.wait_for_notifications_with_queued_writes(0.5)
-            self._parse_queue()
+            stop = self._parse_queue()
             if (time.time() - heartbeat_time) >= 12:
                 heartbeat_time = time.time()
                 self.send_heart_measure_keepalive()
                 self.send_gyro_start(sensitivity)
 
-            if int(time.time() - start_time) > duration * 60 : 
+            if int(time.time() - start_time) > duration * 60 or stop: 
                 return 

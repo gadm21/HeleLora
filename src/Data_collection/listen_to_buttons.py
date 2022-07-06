@@ -37,9 +37,9 @@ waiting_between_short_presses = 5
 
 
 activities_durations = { # activities (exercising, sleeping, studying) durations in minutes
-    1 : 2,
-    2 : 2,
-    3 : 2
+    1 : 100, # Exercising
+    2 : 240, # Sleeping
+    3 : 100 # Studying
     }
 
 
@@ -90,7 +90,8 @@ def turn_on_for(pin, milliseconds) :
 
 def start() :
     print("START")
-    global last_long_press_at, program_state, last_short_press_at, presses_counter
+    global last_long_press_at, program_state, last_short_press_at, presses_counter, stop_flag
+    stop_flag = False
     last_long_press_at = time.time()
     last_short_press_at = 0
     presses_counter = 0
@@ -108,14 +109,16 @@ def end() :
 
 
 def collect_data() :
-    global program_state, presses_counter
+    global program_state, presses_counter, stop_flag
     program_state = 'collecting' 
     print("collecting data")
     blnk(led_pin, in_between_delay = 500, iterations = presses_counter)
     wiringpi.delay(3000)
-    while program_state == 'collecting' : 
+    while not is_long_pressed(button_pin, long_press_threshold) :
         blnk(led_pin, in_between_delay = 300, iterations = 3)
-
+    stop_flag = True
+    end()
+    
 
 def handle_states (prog_state, button_state) : 
     global last_long_press_at, last_short_press_at, presses_counter

@@ -18,7 +18,7 @@ def get_args() :
 
 auth_key_filename = 'auth_key.txt'
 mac_filename = 'mac.txt'
-
+dataset_path = None 
 band = None
 
 # list of lists. Each element is a list of 6 measurements at some time t. The measurements are (ordered):
@@ -26,7 +26,7 @@ band = None
 timeseries_data = [] 
 timeseries_maxlen = 30
 start_time = 0
-
+stop_flag = False
 #-------------------------------------------------------------------------#
 
 
@@ -66,7 +66,7 @@ def get_auth_key(filename):
 
 
 
-def save_dataset(label): 
+def save_dataset(is_last = False, label = None): 
     ''' 
     saves a txt file containing the data in the following format: 
     - The first line contains the label, which can be either 1 (exercise), 2 (sleeping), or 3 (studying). 
@@ -74,19 +74,34 @@ def save_dataset(label):
         * IF it contains 4 values, the values are for the variables ['gyro_x', 'gryo_y', 'gyro_z', 'timestamp']
         * If it contains 2 values, the values are for the variables ['heart rate', 'timestamp']
     '''
-    file_path = os.path.join('/home/pi/Desktop/Data', '{}_{}_.txt'.format(label, int(time.time())) )
-    with open(file_path, 'w') as f : 
-        f.write(str(label))
-        f.write('\n') 
+    global timeseries_data, dataset_path
+    
+    first_attempt = False
+    dir_path = '/home/pi/Desktop/Data'
+    if not os.path.exists(dir_path) :
+        os.makedirs(dir_path)
+    
+    if dataset_path is None : 
+        dataset_path = os.path.join(dir_path, '{}_{}_.txt'.format(label, int(time.time())) )
+        first_attempt = True
+        
+    with open(dataset_path, 'a') as f :
+        if first_attempt : 
+            f.write('start')
+            f.write('\n')
+        elif is_last :
+            f.write('end')
+            f.write('\n') 
         for datum in timeseries_data : 
             f.write(','.join(str(d) for d in datum))
             f.write('\n') 
-      
+    timeseries_data = [] 
 
 
    
 
 def sensors_callback(data):
+    global stop_flag
     tick_time = time.time() 
 
     data_type = data[0] 
@@ -99,6 +114,13 @@ def sensors_callback(data):
     elif data_type == 'HR' : 
         current_data = [data, tick_time]
         timeseries_data.append(current_data)
+        
+    if len(timeseries_data) > timeseries_maxlen :
+        save_dataset()
+    
+    if stop_flag :
+        print("stop flag:", stop_flag) 
+    return stop_flag
 
 
 
@@ -129,9 +151,10 @@ def start_data_pull(duration, label):
     start_time = time.time() 
     while True:
         try:
+            save_dataset(label = label) # just to create the file and name it with label.
             band.start_heart_and_gyro(sensitivity=1, callback=sensors_callback, start_time = start_time, duration = duration)
             if int(time.time() - start_time) > duration * 60 : 
-                save_dataset(label) 
+                save_dataset(is_last = True) 
                 return  
              
         except BTLEDisconnectError:
@@ -143,4 +166,6 @@ def start_data_pull(duration, label):
 if __name__ == "__main__":
     args = get_args() 
     connect()
-    threading.Thread(target=start_data_pull, args = (args.duration, args.label,)).start()
+    t1 = threading.Thread(target=start_data_pull, args = (args.duration, args.label,))
+    t1.start()
+    t1.join()
