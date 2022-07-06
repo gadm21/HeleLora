@@ -9,10 +9,10 @@ receiver_addr = 2
 file_path = '/home/pi/Desktop/Data/test.txt'
 delays = [1, 3, 5]
 for delay in delays :
-
+    fake_filename = str(delay) + '_' + str(int(time.time()))
     with open(file_path) as f:
         for line in f:
-            lora.send_msg(receiver_addr, filename+','+line)
+            lora.send_msg(receiver_addr, fake_filename+','+line)
             time.sleep(delay)
         print("Done sending file with delay:", delay)
 
