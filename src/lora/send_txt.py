@@ -13,7 +13,7 @@ for filename in os.listdir(data_dir):
         with open(data_dir+filename) as f:
             for line in f:
                 print("sending data", line.strip('\r\n'))
-                lora.send_msg(receiver_addr, filename+','+line)
+                lora.send_msg(receiver_addr, filename+','+line.strip('\r\n'))
                 time.sleep(5)
             print("Done sending file")
         os.system('mv '+data_dir+filename+' '+data_dir+'Sent/'+filename)
