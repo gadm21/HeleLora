@@ -36,7 +36,7 @@ while 1:
                 save_data(filename)
                 all_data[filename] = []
         elif waiting_time > idle_maxwait :
-            for filename, data in all_data.keys() :
+            for filename, data in all_data.items() :
                 if len(data) > 0 :
                     save_data(filename)
                     all_data[filename]= [] 
