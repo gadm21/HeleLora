@@ -38,6 +38,6 @@ while 1:
         elif waiting_time > idle_maxwait :
             for filename, data in all_data.items() :
                 if len(data) > 0 :
-                    save_data(filename)
+                    save_data(data_dir+filename)
                     all_data[filename]= [] 
             
