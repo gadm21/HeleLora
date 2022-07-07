@@ -8,7 +8,7 @@ lora = LoRa.LoRa() # Initialize serial instance
 lora.set_addr(1)  # Sets the LoRa address
 receiver_addr = 2
 file_path = '/home/pi/Desktop/Data/test.txt'
-delays = [1, 2]
+delays = [0, 0.5]
 for delay in delays :
     fake_filename = str(delay) + '_' + str(int(time.time()))
     with open(file_path) as f:

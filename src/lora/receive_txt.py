@@ -23,8 +23,8 @@ def save_data(filepath):
         
 while 1:
         received = lora.read_msg()
+        waiting_time = time.time() - last_received_at
         if bool(received):
-            waiting_time = time.time() - last_received_at
             last_received_at = time.time() 
             datum = received['data']
             filename = received['filename']
@@ -32,6 +32,12 @@ while 1:
             if not filename in all_data.keys() :
                 all_data[filename] = []
             all_data[filename].append(datum)
-            if len(all_data[filename]) > data_maxlen or waiting_time > idle_maxwait:
+            if len(all_data[filename]) > data_maxlen:
                 save_data(filename)
-                all_data[filename] = [] 
+                all_data[filename] = []
+        elif waiting_time > idle_maxwait :
+            for filename, data in all_data.keys() :
+                if len(data) > 0 :
+                    save_data(filename)
+                    all_data[filename]= [] 
+            
