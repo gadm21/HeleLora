@@ -8,17 +8,17 @@ data_dir = '/home/pi/Desktop/Data/'
 count = 0
 all_data = {}
 data_maxlen = 99 
-idle_maxwait = 10 # seconds
+idle_maxwait = 5 # seconds
 last_received_at = time.time()
 
-def save_data(filepath):
+def save_data(filename):
     global all_data
-    data = all_data[filepath]
-    with open(filepath, 'a') as f:
+    data = all_data[filename]
+    with open(data_dir+filename, 'a') as f:
         num_lines = len(data) 
         for datum in data :
             f.write(datum+'\n')
-        print("file {} has {} lines".format(filepath.split('/')[-1], num_lines))
+        print("file {} has {} lines".format(filename, num_lines))
         
         
 while 1:
@@ -36,7 +36,7 @@ while 1:
                 save_data(filename)
                 all_data[filename] = []
         elif waiting_time > idle_maxwait :
-            for filename, data in all_data.keys() :
+            for filename, data in all_data.items() :
                 if len(data) > 0 :
                     save_data(filename)
                     all_data[filename]= [] 
