@@ -3,8 +3,7 @@ import wiringpi
 import time
 import subprocess
 import threading
-
-from connect_and_collect import connect, start_data_pull
+import LoRa
 
 # initialize
 wiringpi.wiringPiSetup()
@@ -35,8 +34,8 @@ long_press_threshold = 3
 waiting_between_short_presses = 5
 
 file_path = '/home/pi/Desktop/Data/test.txt'
-
-
+receiver_addr = 2
+lora = LoRa.LoRa() 
 
 def is_on(pin): 
     return wiringpi.digitalRead(pin) 
@@ -132,16 +131,16 @@ def handle_states (prog_state, button_state) :
             last_short_press_at = time.time()
         else :
             
-	    if presses_counter > 0 and last_short_press_at > 0 and time.time() - last_short_press_at > waiting_between_short_presses :
-	    	delay = presses_counter - 1
-       	    	fake_filename = 'z'+str(delay)+'z'+str(time.time())+'z'
-	    	with open(file_path) as f : 
-	    		for line in f : 
-				lora.send_msg(receiver_addr, fake_filename+','line.strip('\r\n'))
-				turn_on(led_pin)
-				time.sleep(delay)
-				turn_off(led_pin)
-	    	end() 
+            if presses_counter > 0 and last_short_press_at > 0 and time.time() - last_short_press_at > waiting_between_short_presses :
+                delay = presses_counter - 1
+                fake_filename = 'z'+str(delay)+'z'+str(time.time())+'z'
+                with open(file_path) as f : 
+                    for line in f : 
+                        lora.send_msg(receiver_addr, fake_filename+','+line.strip('\r\n'))
+                        turn_on(led_pin)
+                        time.sleep(delay)
+                        turn_off(led_pin)
+                end() 
 
     
     elif prog_state == 'collecting': 
