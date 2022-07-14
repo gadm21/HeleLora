@@ -37,9 +37,9 @@ waiting_between_short_presses = 5
 
 
 activities_durations = { # activities (exercising, sleeping, studying) durations in minutes
-    1 : 30, # Exercising
+    1 : 60, # Exercising
     2 : 240, # Sleeping
-    3 : 30 # Studying
+    3 : 60 # Studying
     }
 
 
