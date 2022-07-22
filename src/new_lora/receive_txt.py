@@ -26,18 +26,20 @@ while 1:
         waiting_time = time.time() - last_received_at
         if bool(received):
             last_received_at = time.time() 
-            datum = received['data']
-            filename = received['filename']
-            print('received:', datum)
-            if not filename in all_data.keys() :
-                all_data[filename] = []
-            all_data[filename].append(datum)
-            if len(all_data[filename]) > data_maxlen:
-                save_data(filename)
-                all_data[filename] = []
+            data = received['data']
+            rssi = received['rssi'] 
+            snr = received['snr'] 
+
+            file_id = received['filename']
+            print('received:', data)
+
+            if not file_id in all_data.keys() :
+                all_data[file_id] = []
+            all_data[file_id].append(data)
+
         elif waiting_time > idle_maxwait :
-            for filename, data in all_data.items() :
+            for file_id, data in all_data.items() :
                 if len(data) > 0 :
-                    save_data(data_dir+filename)
-                    all_data[filename]= [] 
+                    save_data(file_id)
+                    all_data[file_id]= [] 
             

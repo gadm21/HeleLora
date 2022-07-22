@@ -1,19 +1,34 @@
 import LoRa
 import time
 import os
+import argparse 
+import random
 
 lora = LoRa.LoRa() # Initialize serial instance
-#time.sleep(3)
-lora.set_addr(1)  # Sets the LoRa address
-receiver_addr = 2
+sender_address = 1
+receiver_address = 2
+lora.set_addr(sender_address)  # Sets the LoRa address
+
+def get_args() : 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-SF', '--spreading_factor', required=False, type = int, help='set the spreading factor of LoRa.', default = 12)
+    parser.add_argument('-L', '--num_lines', required=False, type = int, help='Number of lines in the simulation file to be sent.', default = 20)
+    parser.add_argument('-D', '--delay', required=False, type = int, help='Sending delay between line (in seconds).', default = 0)
+    args = parser.parse_args()
+    return args
+
 data_dir = '/home/pi/Desktop/Data/'
 
-for filename in os.listdir(data_dir):
-    if os.path.isfile(os.path.join(data_dir, filename)):
-        with open(data_dir+filename) as f:
-            for line in f:
-                print("sending data", line.strip('\r\n'))
-                lora.send_msg(receiver_addr, filename+','+line.strip('\r\n'))
-                time.sleep(5)
-            print("Done sending file")
-        os.system('mv '+data_dir+filename+' '+data_dir+'Sent/'+filename)
+if __name__ == "__main__" : 
+    args = get_args
+    file_id = str(random.randint(0, 999))
+    print("File id:{}  msg length:{}  delay:{}"\
+        .format(file_id, len(lora.sample_message(file_id = file_id, line_id = 0, SF = args.spreading_factor)), args.delay)) 
+    
+    for line in range(args.num_lines) : 
+        msg = lora.sample_message(file_id = file_id, line_id = line, SF = args.spreading_factor)
+        lora.send_msg(receiver_address, msg)
+        time.sleep(args.delay) 
+    print("Done sending file id:", file_id) 
+    
+    
