@@ -43,7 +43,7 @@ class LoRa:
             received_dict = {'sender': rcv[0], 'length': rcv[1], 'data': self._decode_data(rcv[2], read_timestamp),  'rssi': rcv[-2], 'snr': rcv[-1]}
             return received_dict
         else : 
-            raise ValueError("received strange msg:{}".format(msg))
+            print("received strange msg:{}".format(msg))
 
     def _decode_data(self, msg, read_timestamp): 
         data = msg.split('_') 

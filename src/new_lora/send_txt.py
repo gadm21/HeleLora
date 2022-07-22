@@ -20,7 +20,7 @@ def get_args() :
 data_dir = '/home/pi/Desktop/Data/'
 
 if __name__ == "__main__" : 
-    args = get_args
+    args = get_args()
     file_id = str(random.randint(0, 999))
     print("File id:{}  msg length:{}  delay:{}"\
         .format(file_id, len(lora.sample_message(file_id = file_id, line_id = 0, SF = args.spreading_factor)), args.delay)) 
