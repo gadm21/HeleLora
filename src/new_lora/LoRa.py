@@ -60,7 +60,7 @@ class LoRa:
         delay = str(delay)
         SF = str(SF) 
         return '{}_{}_{}_{}_{}_{}'\
-            .format(file_id.zfill(4), line_id.zfill(3), num_lines.zfill(3), self.parameters['SF'].zfill(2), str(int(time.time())), delay.zfill(2))
+            .format(file_id.zfill(4), line_id.zfill(3), num_lines.zfill(3), SF.zfill(2), str(int(time.time())), delay.zfill(2))
     
     def sample_file(self, num_lines, SF = None): 
         return [self.sample_message(i, SF) for i in range(num_lines)]
