@@ -23,10 +23,10 @@ if __name__ == "__main__" :
     args = get_args()
     file_id = str(random.randint(0, 999))
     print("File id:{}  msg length:{}  delay:{}"\
-        .format(file_id, len(lora.sample_message(file_id = file_id, line_id = 0, SF = args.spreading_factor)), args.delay)) 
+        .format(file_id, len(lora.sample_message(file_id = file_id, line_id = 0, args.num_lines, delay = args.delay, SF = args.spreading_factor)), args.delay)) 
     
     for line in range(args.num_lines) : 
-        msg = lora.sample_message(file_id = file_id, line_id = line, SF = args.spreading_factor)
+        msg = lora.sample_message(file_id = file_id, line_id = line, args.num_lines, delay = args.delay, SF = args.spreading_factor)
         lora.send_msg(receiver_address, msg)
         time.sleep(args.delay) 
     print("Done sending file id:", file_id) 
