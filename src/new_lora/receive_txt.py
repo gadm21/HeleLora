@@ -14,9 +14,10 @@ last_received_at = time.time()
 def save_data(filename):
     global all_data
     data = all_data[filename]
-    with open(data_dir+filename, 'a') as f:
+    with open(data_dir+filename+'.txt', 'a') as f:
         num_lines = len(data) 
         for datum in data :
+            datum = '_'.join([str(d) for d in datum]) 
             f.write(datum+'\n')
         print("file {} has {} lines".format(filename, num_lines))
         
@@ -28,10 +29,13 @@ while 1:
             last_received_at = time.time() 
             data = received['data']
             rssi = received['rssi'] 
-            snr = received['snr'] 
-
-            file_id = received['filename']
-            print('received:', data)
+            snr = received['snr']
+            print(type(data), ' ', len(received['rssi']))
+            rssi = int(received['rssi'])
+            snr= int(received['snr'])
+            print("rssi:", rssi, " snr:", snr) 
+            file_id = data[0]
+            print('received:', data, ' rssi:{} snr:{}'.format(rssi, snr))
 
             if not file_id in all_data.keys() :
                 all_data[file_id] = []

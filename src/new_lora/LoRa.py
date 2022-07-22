@@ -29,7 +29,7 @@ class LoRa:
         if self.parameters[parameter] == value : 
             return 
         self.parameters[parameter] = value
-        command = 'AT+PARAMETER=' + ','.join(self.parameters.values())
+        command = 'AT+PARAMETER=' + ','.join(str(self.parameters.values()))
         self.cmd(command) 
     
     def send_msg(self, addr, msg):
@@ -43,7 +43,7 @@ class LoRa:
             received_dict = {'sender': rcv[0], 'length': rcv[1], 'data': self._decode_data(rcv[2], read_timestamp),  'rssi': rcv[-2], 'snr': rcv[-1]}
             return received_dict
         else : 
-            print("received strange msg:{}".format(msg))
+            pass
 
     def _decode_data(self, msg, read_timestamp): 
         data = msg.split('_') 
