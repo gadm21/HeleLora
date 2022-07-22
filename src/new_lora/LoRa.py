@@ -52,8 +52,13 @@ class LoRa:
 
 
     def sample_message(self, file_id, line_id, num_lines, delay, SF):
-
-        self.set_param('SF', SF)  
+        
+        self.set_param('SF', SF)
+        file_id = str(file_id)
+        line_id = str(line_id)
+        num_lines = str(num_lines)
+        delay = str(delay)
+        SF = str(SF) 
         return '{}_{}_{}_{}_{}_{}'\
             .format(file_id.zfill(4), line_id.zfill(3), num_lines.zfill(3), self.parameters['SF'].zfill(2), str(int(time.time())), delay.zfill(2))
     
